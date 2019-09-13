@@ -12,9 +12,9 @@ library(shinydashboard)
 # Load data
 araptusdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNCFb3C1oSia_dN5ISXusrGqwVSFibt0_zkqq7wiNtW_tl1DM-Ch-fIKKmIz_ijXxdrKux6qvvy8yD/pub?output=csv")
 # rast <- raster("alt_22.tif")
-# Currently getting error; cannot create RasterLayer file does not exist
+# Currently getting error; cannot create RasterLayer; file does not exist
 
-# Create a custom marker for fun map
+# A custom marker for fun map
 bluepointicon <- makeIcon(
     iconUrl = "https://www.twinword.com/wp-content/uploads/2016/10/location-icon-vector-blue-pin.svg",
     iconWidth = 30,
@@ -41,14 +41,12 @@ ui <- dashboardPage(
     
     # Body of pages
     dashboardBody(
-        fluidRow(
-            box(
-                title = "Data",
-                dataTableOutput("araptusdata", height = 250)),
+        fluidPage(
+            box(title = "Data",
+                dataTableOutput("araptusdatatable")),
             
-            box(
-                title = "Map",
-                leafletOutput("araptusmap", height = 250))
+            box(title = "Map",
+                leafletOutput("araptusmap"))
             
             
         )
@@ -62,7 +60,31 @@ ui <- dashboardPage(
 
 server <- function(input, output, session) {
     # Output for datatable
-    output$araptusdatatable = DT::renderDataTable({araptusdata}, filter="top")
+    output$araptusdatatable = DT::renderDataTable({araptusdata},
+                                                  filter="top",
+                                                  fillContainer = TRUE,
+                                                  extensions = c("Buttons",
+                                                                 "Scroller"),
+                                                  rownames = FALSE,
+                                                  style = "bootstrap",
+                                                  class = "compact",
+                                                  height = "100%",
+                                                  options = list(
+                                                      # dom = "Blrtip",
+                                                      deferRender = TRUE,
+                                                      scrollY = 10,
+                                                      scroller = TRUE,
+                                                      columnDefs = list(
+                                                          list(
+                                                              visible = TRUE)),
+                                                      buttons = list(
+                                                          "csv", "excel")),
+                                                  colnames = c("Site Number" = "Site",
+                                                               "Long" = "Longitude",
+                                                               "Lat" = "Latitude",
+                                                               "No. Males" = "Males",
+                                                               "No. Females" = "Females",
+                                                               "Suitability" = "Suitability"))
     
     # Output for leaflet:
     output$araptusmap <- renderLeaflet({
