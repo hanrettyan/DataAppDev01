@@ -47,20 +47,27 @@ ui <- dashboardPage(skin = "yellow",
                     dashboardBody(
                         tabItems(
                             #ENVS 601 page
+                            #This page uses FILLPAGE for the datatable at the top of the page, and then adds the map as a box below:
                             tabItem(tabName = "envs601",
                                     fillPage(
-                                       title = "Envs 601 data",
-                                       dataTableOutput("araptusdatatable"),
-                                       leafletOutput("araptusmap"))),
-
+                                        title = "Data", solidHeader = "DATA",
+                                        dataTableOutput("araptusdatatable", height = 500)
+                                    ),
+                                    
+                                    box(
+                                        title = "Map", solidHeader = TRUE,
+                                        leafletOutput("araptusmap")
+                                    )),
                             
                             #ENVS 602 page
+                            #This page just includes a datatable as a fillpage
                             tabItem(tabName = "envs602",
                                     fillPage(
                                         title = "Envs 602 data",
                                         dataTableOutput("classesdatatable"))),
                             
                             #ENVS 603 page
+                            #This page includes the datatable and the map as components of the FILLPAGE
                             tabItem(tabName = "envs603",
                                     fillPage(
                                         title = "Envs 603 data",
