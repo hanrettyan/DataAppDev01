@@ -2,7 +2,10 @@
 
 library(sf)
 library(rgdal)
-library(crosstalk) # This produces an error, I think we need the other version listed below anyways.
+library(crosstalk) 
+library(dplyr)
+library(leaflet)
+library(DT)
 
 
 # ---------------------------------------------
@@ -25,20 +28,17 @@ st_write(plot_araptusdata, "PlotAraptusData.shp", driver = "ESRI Shapefile")
 # ---------------------------------------------
 # INSTALL CROSSTALK:
 # First you will need to install this version of crosstalk: 
-devtools::install_github("dmurdoch/leaflet@crosstalk4")
+# devtools::install_github("dmurdoch/leaflet@crosstalk4")
 
 # ---------------------------------------------
 # CONVERT SF OBJECTS TO SPATIAL?:
 # Or, if you use sf and dplyr for most spatial tasks (like me) convert an sf object to Spatial:
-library(dplyr)
 shapes_to_filter <- st_read("PlotAraptusData.shp") %>% as('Spatial')  # sf import to 'Spatial Object'
 
   
 # ---------------------------------------------
 # CREATE SHARED DATA OBJECTS FOR LEAFLET AND A COPY FOR THE DATATABLE:
 # Then create an sd object for leaflet, and a data frame copy for the filters (IMPORTANT: note how the group for sd_df is set using the group names from the sd_map):
-
-library(crosstalk)
 sd_map <- SharedData$new(shapes_to_filter)
 sd_df <- SharedData$new(as.data.frame(shapes_to_filter@data), group = sd_map $groupName())
 # sd <- SharedData$new(plot_araptusdata)
