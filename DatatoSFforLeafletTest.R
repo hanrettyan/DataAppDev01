@@ -2,6 +2,7 @@
 
 library(sf)
 library(rgdal)
+library(crosstalk) # This produces an error, I think we need the other version listed below anyways.
 
 
 # ---------------------------------------------
@@ -9,11 +10,17 @@ library(rgdal)
 araptusdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNCFb3C1oSia_dN5ISXusrGqwVSFibt0_zkqq7wiNtW_tl1DM-Ch-fIKKmIz_ijXxdrKux6qvvy8yD/pub?output=csv")
 str(araptusdata)
 
-# CONVER THE DATA INTO SIMPLE FEATURE AND SPECIFIC THE COORDINATES AND COORDINATE REFERENCE SYSTEM:
-plot_araptusdata <- st_as_sf(araptusdata, coords = c("Latitude", "Longitude"), crs = "+init=epsg:4326")
+# CONVERT THE DATA INTO SIMPLE FEATURE AND SPECIFIC THE COORDINATES AND COORDINATE REFERENCE SYSTEM:
+plot_araptusdata <- st_as_sf(araptusdata, coords = c("Longitude", "Latitude"), crs = "+init=epsg:3857")
 
 # CONRFIRM CRS:
 st_crs(plot_araptusdata)
+
+# Test plot spatial object:
+plot(plot_araptusdata$geometry, main = "Test Plot")
+
+# Output to shapefile (for fun):
+st_write(plot_araptusdata, "PlotAraptusData.shp", driver = "ESRI Shapefile")
 
 # ---------------------------------------------
 # INSTALL CROSSTALK:
@@ -23,37 +30,32 @@ devtools::install_github("dmurdoch/leaflet@crosstalk4")
 # ---------------------------------------------
 # CONVERT SF OBJECTS TO SPATIAL?:
 # Or, if you use sf and dplyr for most spatial tasks (like me) convert an sf object to Spatial:
-# library(dplyr)
-# library(sf)
-# shapes_to_filter <- st_read("data/features.shp") %>% as('Spatial')  # sf import to 'Spatial Object'
-# sf:::as_Spatial() 
+library(dplyr)
+shapes_to_filter <- st_read("PlotAraptusData.shp") %>% as('Spatial')  # sf import to 'Spatial Object'
 
   
 # ---------------------------------------------
 # CREATE SHARED DATA OBJECTS FOR LEAFLET AND A COPY FOR THE DATATABLE:
-# Then create an sd object for leaflet, and a data frame copy for the filters (IMPORTANT: note how the group for sd_df is set using the group names from the sd_map) :
+# Then create an sd object for leaflet, and a data frame copy for the filters (IMPORTANT: note how the group for sd_df is set using the group names from the sd_map):
+
+library(crosstalk)
+sd_map <- SharedData$new(shapes_to_filter)
+sd_df <- SharedData$new(as.data.frame(shapes_to_filter@data), group = sd_map $groupName())
+# sd <- SharedData$new(plot_araptusdata)
+
+
+
+# CREATE MAP AND DATATABLE USING SHARED DATA OBJECTS: 
+bscols(
+  leaflet(sd_map) %>%
+    addProviderTiles(providers$Esri.WorldImagery, group = "Imagery") %>%
+    # addRasterImage(rast, opacity = 0.5, group = "Elevation Raster") %>%
+    addMarkers( label = ~Site, group = "Araptus Data") %>%
+    addLayersControl(
+      overlayGroups = c("Elevation Raster", "Araptus Data"),
+      options = layersControlOptions(collapsed = FALSE)
+    ),
   
-# library(crosstalk)
-# sd_map <- SharedData$new(shapes_to_filter)
-# sd_df <- SharedData$new(as.data.frame(shapes_to_filter@data), group = sd_map $groupName())
-
-  
-# ---------------------------------------------
-# CREATE CROSSTALK FILTERS USING SD_DF:
-# Create crosstalk filters using sd_df:
-# filter_select("filterid",  "Select Filter Label", sd_df, ~SomeColumn)
-
-
-# ---------------------------------------------
-# CREATE THE MAP USING SD_MAP OBJECT:
-# library(leaflet)
-# leaflet() %>%
-# addProviderTiles("OpenStreetMap") %>%
-# addPolygons(data = sd_map)
-
-
-# ---------------------------------------------
-# THE DATATABLE ALSO NEEDS TO USE THE SD_DF OBJECT:
-# library(DT)
-# datatable(sd_df)
-
+  datatable(sd_df, extensions = "Scroller", style="Bootstrap", class="compact", width="100%",
+            options=list(deferRender=TRUE, scrollY=100, scroller=TRUE))
+)
