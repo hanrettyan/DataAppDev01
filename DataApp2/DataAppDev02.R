@@ -80,34 +80,14 @@ ui <- dashboardPage(skin = "yellow",
 #### SERVER #####
 #################
 
-# CONVERT CSV DATA INTO SF:
-araptusdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNCFb3C1oSia_dN5ISXusrGqwVSFibt0_zkqq7wiNtW_tl1DM-Ch-fIKKmIz_ijXxdrKux6qvvy8yD/pub?output=csv")
-str(araptusdata)
-
 # CONVERT THE DATA INTO SIMPLE FEATURE AND SPECIFIC THE COORDINATES AND COORDINATE REFERENCE SYSTEM:
-plot_araptusdata <- st_as_sf(araptusdata, coords = c("Longitude", "Latitude"), crs = "+init=epsg:3857")
-
-# Confirm CRS:
-# st_crs(plot_araptusdata)
-# Test plot spatial object:
-# plot(plot_araptusdata$geometry, main = "Test Plot")
-# Output to shapefile (for fun):
-
-
-# CONVERT SF OBJECTS TO SPATIAL:
-# st_write(plot_araptusdata, "PlotAraptusData.shp", driver = "ESRI Shapefile")
-# shapes_to_filter <- st_read("PlotAraptusData.shp") %>% as('Spatial')  # sf import to 'Spatial Object'
-
-shapes_to_filter <- plot_araptusdata %>% as('Spatial')
-names(shapes_to_filter@data)[4] <- "Sutblty"
 
 
 # ---------------------------------------------
 # CREATE SHARED DATA OBJECTS FOR LEAFLET AND A COPY FOR THE DATATABLE:
 # Then create an sd object for leaflet, and a data frame copy for the filters (IMPORTANT: note how the group for sd_df is set using the group names from the sd_map):
-sd_map <- SharedData$new(shapes_to_filter)
-sd_df <- SharedData$new(as.data.frame(shapes_to_filter@data), group = sd_map $groupName())
-
+sd_map <- SharedData$new(araptusdata)
+sd_df <- SharedData$new( araptusdata , group = sd_map$groupName())
 
 server <- function(input, output) {
     # Output for ARAPTUS datatable
@@ -120,6 +100,7 @@ server <- function(input, output) {
                                                   style = "bootstrap",
                                                   class = "compact",
                                                   height = "100%",
+                                                  server = FALSE,
                                                   options = list(
                                                       lengthChange = FALSE,
                                                       dom = "Blrtip",
@@ -134,10 +115,10 @@ server <- function(input, output) {
                                                       buttons = list(
                                                           "csv", "excel")),
                                                   colnames = c("Site" = "Site",
-                                                               "Long" = "Longitude",
-                                                               "Lat" = "Latitude",
-                                                               "No. Males" = "Males",
-                                                               "No. Females" = "Females",
+                                                               "longitude" = "Longitude",
+                                                               "latitude" = "Latitude",
+                                                               "Males" = "Males",
+                                                               "Females" = "Females",
                                                                "Suitability" = "Suitability"))
     
     

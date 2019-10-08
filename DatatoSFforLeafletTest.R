@@ -11,7 +11,7 @@ library(DT)
 # ---------------------------------------------
 # CONVERT CSV DATA INTO SF:
 araptusdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNCFb3C1oSia_dN5ISXusrGqwVSFibt0_zkqq7wiNtW_tl1DM-Ch-fIKKmIz_ijXxdrKux6qvvy8yD/pub?output=csv")
-str(araptusdata)
+
 
 # CONVERT THE DATA INTO SIMPLE FEATURE AND SPECIFIC THE COORDINATES AND COORDINATE REFERENCE SYSTEM:
 plot_araptusdata <- st_as_sf(araptusdata, coords = c("Longitude", "Latitude"), crs = "+init=epsg:3857")
@@ -23,7 +23,10 @@ st_crs(plot_araptusdata)
 plot(plot_araptusdata$geometry, main = "Test Plot")
 
 # Output to shapefile (for fun):
-st_write(plot_araptusdata, "PlotAraptusData.shp", driver = "ESRI Shapefile")
+#st_write(plot_araptusdata, "PlotAraptusData.shp", driver = "ESRI Shapefile",delete_dsn=TRUE)
+
+
+
 
 # ---------------------------------------------
 # INSTALL CROSSTALK:
@@ -33,14 +36,18 @@ st_write(plot_araptusdata, "PlotAraptusData.shp", driver = "ESRI Shapefile")
 # ---------------------------------------------
 # CONVERT SF OBJECTS TO SPATIAL?:
 # Or, if you use sf and dplyr for most spatial tasks (like me) convert an sf object to Spatial:
-shapes_to_filter <- st_read("PlotAraptusData.shp") %>% as('Spatial')  # sf import to 'Spatial Object'
+#shapes_to_filter <- st_read("PlotAraptusData.shp") %>% as('Spatial')  # sf import to 'Spatial Object'
+#unlink("PlotAraptusData.shp")
+
+shapes_to_filter <- plot_araptusdata %>% as("Spatial")
+
 
   
 # ---------------------------------------------
 # CREATE SHARED DATA OBJECTS FOR LEAFLET AND A COPY FOR THE DATATABLE:
 # Then create an sd object for leaflet, and a data frame copy for the filters (IMPORTANT: note how the group for sd_df is set using the group names from the sd_map):
 sd_map <- SharedData$new(shapes_to_filter)
-sd_df <- SharedData$new(as.data.frame(shapes_to_filter@data), group = sd_map $groupName())
+sd_df <- SharedData$new(as.data.frame(shapes_to_filter@data), group = sd_map$groupName())
 # sd <- SharedData$new(plot_araptusdata)
 
 
