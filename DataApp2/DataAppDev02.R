@@ -12,7 +12,7 @@ library(leaflet)
 library(dplyr)
 library(shinydashboard)
 library(sf)
-library(rgdal)
+library(htmlwidgets)
 
 
 # Load data (using different sets of sample data)
@@ -28,15 +28,19 @@ rast <- raster("alt_22.tif")
 ui <- dashboardPage(skin = "yellow",
                     
                     # Page header/app title
-                    dashboardHeader(title = "ENVS Class Data Portal", titleWidth = 250),
+                    dashboardHeader(title = "ENVS Class Data Portal", titleWidth = 300),
                     
                     # Sidebar/list of classes to open pages
                     dashboardSidebar(
+                        # The following line hides the toggle button on the dashboardheader:
+                        tags$script(JS("document.getElementsByClassName('sidebar-toggle')[0].style.visibility = 'hidden';")),
                         sidebarMenu(
                             menuItem("ENVS Data Portal", tabName= "dataportal", icon = icon("dashboard")),
-                            menuItem("ENVS 401", tabName = "envs401", icon = icon("bar-chart-o")),
-                            menuItem("ENVS 602", tabName = "envs602", icon = icon("bar-chart-o")),
-                            menuItem("ENVS 603", tabName = "envs603", icon = icon("bar-chart-o"))
+                            menuItem("Undergraduate Classes",
+                                     menuSubItem("ENVS 401", tabName = "envs401", icon = icon("bar-chart-o"))),
+                            menuItem("Graduate Classes",
+                                     menuSubItem("ENVS 602", tabName = "envs602", icon = icon("bar-chart-o")),
+                                     menuSubItem("ENVS 603", tabName = "envs603", icon = icon("bar-chart-o")))
                         )
                     ),
                     
@@ -49,17 +53,21 @@ ui <- dashboardPage(skin = "yellow",
                             tabItem(tabName = "dataportal",
                                     fillPage(
                                         h1("Data Portal of ENVS data for classes."),
-                                        tags$img(src="ces_logo.png", width="75%", align="center"),
-                                        h2("Blahdy blah blah blahhhhh!"),
+                                        tags$img(src="ces_logo.png", width="80%", align="center"),  
+                                        h2("Blahdy blah blah blahhhhh!"),  
+                                        h2(" "),  # Just makes blank space between lines,
                                         h4("This is cool!")
                                     )),
                             
-                            #ENVS 601 page: preferred layout
-                            tabItem(tabName = "envs601",
+                            #ENVS 401 page: preferred layout
+                            tabItem(tabName = "envs401",
                                     fillPage(
-                                        h1("Class Data for ENVS601"),
+                                        h1("Class Data for fake ENVS401"),
+                                        h2(" "), # Just makes blank space between lines.
+                                        h4("Select rows or use the selection tool on the map to filter data for download."),
                                         # valueBox( format( sum(araptusdata$Sites), big.mark=",", scientific=FALSE), "Total Sites", icon=icon("couch")),
                                         title = "Data",
+                                        h2(" "),  # Just makes blank spaces between lines.
                                         dataTableOutput("araptusdatatable", height = 400)  
                                     ),
                                     
@@ -73,7 +81,7 @@ ui <- dashboardPage(skin = "yellow",
                             #This page just includes a datatable as a fillpage
                             tabItem(tabName = "envs602",
                                     fillPage(
-                                        h1("Class Data for ENVS602"),
+                                        h1("Class Data for fake ENVS602"),
                                         title = "Envs 602 data",
                                         dataTableOutput("classesdatatable"))),
                             
