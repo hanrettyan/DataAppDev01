@@ -2,6 +2,8 @@
 # WHICH SUCCESSFULLY USED CROSSTALK BETWEEN LEAFLET MAP AND DATATABLE OUTPUTS:
 
 # Load necessary libraries
+# library(devtools)
+# install_github("nik01010/dashboardthemes")   <-- for custom theme but command shinyDashboardThemes not functioning at this time...
 library(shiny)
 library(crosstalk)
 library(DT)
@@ -11,6 +13,7 @@ library(dplyr)
 library(shinydashboard)
 library(sf)
 library(rgdal)
+
 
 # Load data (using different sets of sample data)
 classesdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRFdDGgmoI-9prZL45gHOixA4thITZleI_DkEZ49E-JqELRaxn8K46YM1HaBb0bBgkV5Xx-YrxKRgYM/pub?output=csv")
@@ -25,47 +28,62 @@ rast <- raster("alt_22.tif")
 ui <- dashboardPage(skin = "yellow",
                     
                     # Page header/app title
-                    dashboardHeader(title = "Testing Shiny App"),
+                    dashboardHeader(title = "ENVS Class Data Portal", titleWidth = 250),
                     
                     # Sidebar/list of classes to open pages
                     dashboardSidebar(
                         sidebarMenu(
-                            menuItem("ENVS 601", tabName = "envs601", icon = icon("dashboard")),
-                            menuItem("ENVS 602", tabName = "envs602", icon = icon("dashboard")),
-                            menuItem("ENVS 603", tabName = "envs603", icon = icon("dashboard"))
+                            menuItem("ENVS Data Portal", tabName= "dataportal", icon = icon("dashboard")),
+                            menuItem("ENVS 401", tabName = "envs401", icon = icon("bar-chart-o")),
+                            menuItem("ENVS 602", tabName = "envs602", icon = icon("bar-chart-o")),
+                            menuItem("ENVS 603", tabName = "envs603", icon = icon("bar-chart-o"))
                         )
                     ),
                     
                     # Body of pages
                     dashboardBody(
+                        # shinyDashboardThemes(theme="blue_gradient"),  <-- not working at this time, but keep in case I figure it out.
                         tabItems(
-                            #ENVS 601 page
-                            #This page uses FILLPAGE for the datatable at the top of the page, and then adds the map as a box below:
+                            
+                            #ENVS DATA PORTAL HOME PAGE:
+                            tabItem(tabName = "dataportal",
+                                    fillPage(
+                                        h1("Data Portal of ENVS data for classes."),
+                                        tags$img(src="ces_logo.png", width="75%", align="center"),
+                                        h2("Blahdy blah blah blahhhhh!"),
+                                        h4("This is cool!")
+                                    )),
+                            
+                            #ENVS 601 page: preferred layout
                             tabItem(tabName = "envs601",
                                     fillPage(
-                                        title = "Data", solidHeader = "DATA",
-                                        dataTableOutput("araptusdatatable", height = 500)   # THIS IS WHERE I WILL NEED TO CHANGE THE DATATABLEOUTPUT
+                                        h1("Class Data for ENVS601"),
+                                        # valueBox( format( sum(araptusdata$Sites), big.mark=",", scientific=FALSE), "Total Sites", icon=icon("couch")),
+                                        title = "Data",
+                                        dataTableOutput("araptusdatatable", height = 400)  
                                     ),
                                     
-                                    box(
-                                        title = "Map", solidHeader = TRUE,
-                                        leafletOutput("araptusmap")   # THIS IS WHERE I WILL NEED TO CHANGE THE LEAFLETOUTPUT
+                                    fillPage(
+                                        title = "Map",
+                                        leafletOutput("araptusmap", height = 350)  
                                     )),
+                            
                             
                             #ENVS 602 page
                             #This page just includes a datatable as a fillpage
                             tabItem(tabName = "envs602",
                                     fillPage(
+                                        h1("Class Data for ENVS602"),
                                         title = "Envs 602 data",
                                         dataTableOutput("classesdatatable"))),
                             
+                            
                             #ENVS 603 page
-                            #This page includes the datatable and the map as components of the FILLPAGE
+                            #This page is empty!
                             tabItem(tabName = "envs603",
                                     fillPage(
-                                        title = "Envs 603 data",
-                                        dataTableOutput("araptusdatatable2"),
-                                        leafletOutput("araptusmap2")))
+                                        h1("Surprise! This page is empty!"),
+                                        title = "Envs 603 data"))
                             
                             
                             
@@ -85,7 +103,6 @@ ui <- dashboardPage(skin = "yellow",
 
 # ---------------------------------------------
 # CREATE SHARED DATA OBJECTS FOR LEAFLET AND A COPY FOR THE DATATABLE:
-# Then create an sd object for leaflet, and a data frame copy for the filters (IMPORTANT: note how the group for sd_df is set using the group names from the sd_map):
 sd_map <- SharedData$new(araptusdata)
 sd_df <- SharedData$new( araptusdata , group = sd_map$groupName())
 
@@ -111,14 +128,14 @@ server <- function(input, output) {
                                                       # scroller = TRUE,
                                                       columnDefs = list(
                                                           list(
-                                                              visible = TRUE)),
+                                                              visible = FALSE, targets= c(1:2))),
                                                       buttons = list(
-                                                          "csv", "excel")),
-                                                  colnames = c("Site" = "Site",
-                                                               "longitude" = "Longitude",
-                                                               "latitude" = "Latitude",
-                                                               "Males" = "Males",
-                                                               "Females" = "Females",
+                                                          "csv", "excel", "pdf")),
+                                                  colnames = c("Site No." = "Site",
+                                                               "Longitude" = "Longitude",
+                                                               "Latitude" = "Latitude",
+                                                               "No. Males" = "Males",
+                                                               "No. Females" = "Females",
                                                                "Suitability" = "Suitability"))
     
     
@@ -188,7 +205,7 @@ server <- function(input, output) {
                                                        # scroller = TRUE,
                                                        columnDefs = list(
                                                            list(
-                                                               visible = TRUE)),
+                                                               visible = FALSE, targets=c(1:2))),
                                                        buttons = list(
                                                            "csv", "excel")),
                                                    colnames = c("Site" = "Site",
@@ -197,23 +214,6 @@ server <- function(input, output) {
                                                                 "No. Males" = "Males",
                                                                 "No. Females" = "Females",
                                                                 "Suitability" = "Suitability"))
-    
-    
-    
-    # Output for ARAPTUS leaflet 2:
-    output$araptusmap2 <- renderLeaflet({
-        leaflet(araptusdata) %>%
-            addProviderTiles( providers$Esri.WorldImagery, group = "Imagery") %>%
-            
-            # addRasterImage(rast, opacity = 0.5, group = "Elevation Raster") %>%
-            
-            addMarkers( label = ~Site, group = "Araptus Data") %>%
-            
-            addLayersControl(
-                overlayGroups = c("Elevation Raster", "Araptus Data"),
-                options = layersControlOptions(collapsed = FALSE)
-            )
-    })
     
     
     
