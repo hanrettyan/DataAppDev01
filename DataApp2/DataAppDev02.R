@@ -19,7 +19,7 @@ library(htmlwidgets)
 classesdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRFdDGgmoI-9prZL45gHOixA4thITZleI_DkEZ49E-JqELRaxn8K46YM1HaBb0bBgkV5Xx-YrxKRgYM/pub?output=csv")
 araptusdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNCFb3C1oSia_dN5ISXusrGqwVSFibt0_zkqq7wiNtW_tl1DM-Ch-fIKKmIz_ijXxdrKux6qvvy8yD/pub?output=csv")
 rast <- raster("alt_22.tif")
-
+rvaschoolsdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRQG-5hP_znz9xCFwR8VeAQv4B1ALFZIljlIhhnZHtdmd57c5JDJz3O0Y5SkkaHEDVJB7CJetDPb6KW/pub?gid=466483422&single=true&output=csv")
 
 #################
 ###### UI #######
@@ -37,7 +37,8 @@ ui <- dashboardPage(skin = "yellow",
                         sidebarMenu(
                             menuItem("ENVS Data Portal", tabName= "dataportal", icon = icon("dashboard")),
                             menuItem("Undergraduate Classes",
-                                     menuSubItem("ENVS 401", tabName = "envs401", icon = icon("bar-chart-o"))),
+                                     menuSubItem("ENVS 401", tabName = "envs401", icon = icon("bar-chart-o")),
+                                     menuSubItem("ENVS 402", tabName = "envs402", icon = icon("bar-chart-o"))),
                             menuItem("Graduate Classes",
                                      menuSubItem("ENVS 602", tabName = "envs602", icon = icon("bar-chart-o")),
                                      menuSubItem("ENVS 603", tabName = "envs603", icon = icon("bar-chart-o")))
@@ -77,13 +78,31 @@ ui <- dashboardPage(skin = "yellow",
                                     )),
                             
                             
+                            #ENVS 402 page: 
+                            tabItem(tabName = "envs402",
+                                    fillPage(
+                                        h1("Class Data for fake ENVS402"),
+                                        h2(" "), # Just makes blank space between lines.
+                                        h4("Select rows or use the selection tool on the map to filter data for download."),
+                                        # valueBox( format( sum(araptusdata$Sites), big.mark=",", scientific=FALSE), "Total Sites", icon=icon("couch")),
+                                        title = "Data",
+                                        h2(" "),  # Just makes blank spaces between lines.
+                                        dataTableOutput("rvaschoolsdatatable", height = 400)  
+                                    ),
+                                    
+                                    fillPage(
+                                        title = "Map",
+                                        leafletOutput("rvaschoolsmap", height = 350)  
+                                    )),
+                            
+                            
                             #ENVS 602 page
                             #This page just includes a datatable as a fillpage
                             tabItem(tabName = "envs602",
                                     fillPage(
                                         h1("Class Data for fake ENVS602"),
                                         title = "Envs 602 data",
-                                        dataTableOutput("classesdatatable"))),
+                                        dataTableOutput("classesdatatable", height = 500))),
                             
                             
                             #ENVS 603 page
@@ -110,13 +129,16 @@ ui <- dashboardPage(skin = "yellow",
 
 
 # ---------------------------------------------
-# CREATE SHARED DATA OBJECTS FOR LEAFLET AND A COPY FOR THE DATATABLE:
-sd_map <- SharedData$new(araptusdata)
-sd_df <- SharedData$new( araptusdata , group = sd_map$groupName())
+# CREATE SHARED DATA OBJECTS FOR LEAFLETS AND A COPY FOR THE DATATABLES:
+sd_map_araptus <- SharedData$new(araptusdata)
+sd_df_araptus <- SharedData$new( araptusdata , group = sd_map_araptus$groupName())
+
+sd_map_rvaschools <- SharedData$new(rvaschoolsdata)
+sd_df_rvaschools <- SharedData$new(rvaschoolsdata, group = sd_map_rvaschools$groupName())
 
 server <- function(input, output) {
     # Output for ARAPTUS datatable
-    output$araptusdatatable = DT::renderDataTable({sd_df},
+    output$araptusdatatable = DT::renderDataTable({sd_df_araptus},
                                                   filter="top",
                                                   fillContainer = TRUE,
                                                   extensions = c("Buttons",
@@ -150,19 +172,71 @@ server <- function(input, output) {
     
     # Output for ARAPTUS leaflet:
     output$araptusmap <- renderLeaflet({
-        leaflet(sd_map) %>%
+        leaflet(sd_map_araptus) %>%
             addProviderTiles( providers$Esri.WorldImagery, group = "Imagery") %>%
             
-            # addRasterImage(rast, opacity = 0.5, group = "Elevation Raster") %>%
-            
-            addMarkers( label = ~Site, group = "Araptus Data") %>%
+            addMarkers(lng= ~Longitude, lat= ~Latitude, label = ~Site, group = "Araptus Data") %>%
             
             addLayersControl(
-                overlayGroups = c("Elevation Raster", "Araptus Data"),
+                overlayGroups = c("Araptus Data"),
                 options = layersControlOptions(collapsed = FALSE)
             )
     })
     
+    
+
+    # Output for RVA SCHOOLS datatable
+    output$rvaschoolsdatatable = DT::renderDataTable({sd_df_rvaschools},
+                                                  filter="top",
+                                                  fillContainer = TRUE,
+                                                  extensions = c("Buttons",
+                                                                 "Scroller"),
+                                                  rownames = FALSE,
+                                                  style = "bootstrap",
+                                                  class = "compact",
+                                                  height = "100%",
+                                                  server = FALSE,
+                                                  options = list(
+                                                      lengthChange = FALSE,
+                                                      dom = "Blrtip",
+                                                      autoWidth = TRUE,
+                                                      # deferRender = TRUE,
+                                                      # scrollY = 10,
+                                                      scrollX = 30,
+                                                      # scroller = TRUE,
+                                                      columnDefs = list(
+                                                          list(
+                                                              visible = FALSE, targets= c(0,1,4,5,6))),
+                                                      buttons = list(
+                                                          "csv", "excel", "pdf")),
+                                                  colnames = c("Long" = "X",
+                                                               "Lat" = "Y",
+                                                               "Name" = "School.Name",
+                                                               "Street" = "Street",
+                                                               "City" = "City",
+                                                               "State" = "State",
+                                                               "Zip" = "Zip",
+                                                               "Level" = "Level",
+                                                               "Nmbr" = "Number"))
+    
+    
+    
+    # Output for RVA SCHOOLS leaflet:
+    output$rvaschoolsmap <- renderLeaflet({
+        leaflet(sd_map_rvaschools) %>%
+            
+            addProviderTiles( providers$Esri.WorldStreetMap, group = "Streets") %>%
+            
+            addMarkers(lng = ~X, lat = ~Y, label = ~School.Name, group = "RVA Schools Data") %>%
+            
+            addLayersControl(
+                overlayGroups = c("Richmond Schools", "Streets"),
+                options = layersControlOptions(collapsed = FALSE)
+            )
+    })
+    
+    
+        
     # Output for CLASSES datatable:
     output$classesdatatable = DT::renderDataTable({classesdata},
                                                   filter="top",
@@ -184,7 +258,7 @@ server <- function(input, output) {
                                                           list(
                                                               visible = TRUE)),
                                                       buttons = list(
-                                                          "csv", "excel")),
+                                                          "csv", "excel", "pdf")),
                                                   colnames = c("Class Num" = "CLASS.NUMBER",
                                                                "Name" = "CLASS.NAME",
                                                                "Grade" = "GRADE",
