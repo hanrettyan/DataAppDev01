@@ -1,5 +1,4 @@
-# THIS APP IS ATTEMPTED TO INTEGRATE WHAT WAS SUCESSFULLY CREATED IN DATAAPPDEV01 AS A DASHBOARD AS WELL AS DATATOSFORLEAFLETTEST.R 
-# WHICH SUCCESSFULLY USED CROSSTALK BETWEEN LEAFLET MAP AND DATATABLE OUTPUTS:
+# THIS APP WAS BUILT TO MODEL A GEOSPATIAL DATA PORTAL FOR ENVS CLASSES WITH INTERACTIVE LEAFLET MAPS AND DATATABLES.
 
 # Load necessary libraries
 # library(devtools)
@@ -18,7 +17,6 @@ library(htmlwidgets)
 # Load data (using different sets of sample data)
 classesdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRFdDGgmoI-9prZL45gHOixA4thITZleI_DkEZ49E-JqELRaxn8K46YM1HaBb0bBgkV5Xx-YrxKRgYM/pub?output=csv")
 araptusdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNCFb3C1oSia_dN5ISXusrGqwVSFibt0_zkqq7wiNtW_tl1DM-Ch-fIKKmIz_ijXxdrKux6qvvy8yD/pub?output=csv")
-rast <- raster("alt_22.tif")
 rvaschoolsdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRQG-5hP_znz9xCFwR8VeAQv4B1ALFZIljlIhhnZHtdmd57c5JDJz3O0Y5SkkaHEDVJB7CJetDPb6KW/pub?gid=466483422&single=true&output=csv")
 
 #################
@@ -129,10 +127,6 @@ ui <- dashboardPage(skin = "yellow",
 #### SERVER #####
 #################
 
-# CONVERT THE DATA INTO SIMPLE FEATURE AND SPECIFIC THE COORDINATES AND COORDINATE REFERENCE SYSTEM:
-
-
-# ---------------------------------------------
 # CREATE SHARED DATA OBJECTS FOR LEAFLETS AND A COPY FOR THE DATATABLES:
 sd_map_araptus <- SharedData$new(araptusdata)
 sd_df_araptus <- SharedData$new( araptusdata , group = sd_map_araptus$groupName())
@@ -179,7 +173,7 @@ server <- function(input, output) {
         leaflet(sd_map_araptus) %>%
             addProviderTiles( providers$Esri.WorldImagery, group = "Imagery") %>%
             
-            addMarkers(lng= ~Longitude, lat= ~Latitude, label = ~Site, group = "Araptus Data") %>%
+            addCircles(color = "yellow", lng= ~Longitude, lat= ~Latitude, label = ~Site, group = "Araptus Data") %>%
             
             addLayersControl(
                 overlayGroups = c("Araptus Data"),
@@ -269,42 +263,6 @@ server <- function(input, output) {
                                                                "Year" = "YEAR",
                                                                "Semester" = "SEMESTER")
     )
-    
-    
-    # Output for ARAPTUS datatable 2:
-    output$araptusdatatable2 = DT::renderDataTable({araptusdata},
-                                                   filter="top",
-                                                   fillContainer = TRUE,
-                                                   extensions = c("Buttons",
-                                                                  "Scroller"),
-                                                   rownames = FALSE,
-                                                   style = "bootstrap",
-                                                   class = "compact",
-                                                   height = "100%",
-                                                   options = list(
-                                                       lengthChange = FALSE,
-                                                       dom = "Blrtip",
-                                                       autoWidth = TRUE,
-                                                       # deferRender = TRUE,
-                                                       # scrollY = 10,
-                                                       scrollX = 30,
-                                                       # scroller = TRUE,
-                                                       columnDefs = list(
-                                                           list(
-                                                               visible = FALSE, targets=c(1:2))),
-                                                       buttons = list(
-                                                           "csv", "excel")),
-                                                   colnames = c("Site" = "Site",
-                                                                "Long" = "Longitude",
-                                                                "Lat" = "Latitude",
-                                                                "No. Males" = "Males",
-                                                                "No. Females" = "Females",
-                                                                "Suitability" = "Suitability"))
-    
-    
-    
-    
-    
 }
 
 #################
