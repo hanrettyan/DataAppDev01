@@ -37,8 +37,8 @@ ui <- dashboardPage(skin = "yellow",
                         sidebarMenu(
                             menuItem("ENVS Data Portal", tabName= "dataportal", icon = icon("dashboard")),
                             menuItem("Undergraduate Classes",
-                                     menuSubItem("ENVS 401", tabName = "envs401", icon = icon("bar-chart-o")),
-                                     menuSubItem("ENVS 402", tabName = "envs402", icon = icon("bar-chart-o"))),
+                                     menuSubItem("ENVS 302", tabName = "envs302", icon = icon("bar-chart-o")),
+                                     menuSubItem("ENVS 401", tabName = "envs401", icon = icon("bar-chart-o"))),
                             menuItem("Graduate Classes",
                                      menuSubItem("ENVS 602", tabName = "envs602", icon = icon("bar-chart-o")),
                                      menuSubItem("ENVS 603", tabName = "envs603", icon = icon("bar-chart-o")))
@@ -78,10 +78,10 @@ ui <- dashboardPage(skin = "yellow",
                                     )),
                             
                             
-                            #ENVS 402 page: 
-                            tabItem(tabName = "envs402",
+                            #ENVS 602 page: 
+                            tabItem(tabName = "envs602",
                                     fillPage(
-                                        h1("Class Data for fake ENVS402"),
+                                        h1("Class Data for fake ENVS602"),
                                         h2(" "), # Just makes blank space between lines.
                                         h4("Select rows or use the selection tool on the map to filter data for download."),
                                         # valueBox( format( sum(araptusdata$Sites), big.mark=",", scientific=FALSE), "Total Sites", icon=icon("couch")),
@@ -96,12 +96,14 @@ ui <- dashboardPage(skin = "yellow",
                                     )),
                             
                             
-                            #ENVS 602 page
+                            #ENVS 302 page
                             #This page just includes a datatable as a fillpage
-                            tabItem(tabName = "envs602",
+                            tabItem(tabName = "envs302",
                                     fillPage(
-                                        h1("Class Data for fake ENVS602"),
-                                        title = "Envs 602 data",
+                                        h1("Class Data for fake ENVS302"),
+                                        h4("Just to clarify, these aren't my grades. I did a little better than this..... :) "),
+                                        h2(" "),
+                                        title = "Envs 302 data",
                                         dataTableOutput("classesdatatable", height = 500))),
                             
                             
@@ -109,7 +111,9 @@ ui <- dashboardPage(skin = "yellow",
                             #This page is empty!
                             tabItem(tabName = "envs603",
                                     fillPage(
-                                        h1("Surprise! This page is empty!"),
+                                        h1("Oh no! This page is empty!"),
+                                        h3("But in the meantime... what do you call a cashew that goes to outer space?"),
+                                        h3("..... an ASTRONUT!!!"),
                                         title = "Envs 603 data"))
                             
                             
@@ -227,7 +231,7 @@ server <- function(input, output) {
             
             addProviderTiles( providers$Esri.WorldStreetMap, group = "Streets") %>%
             
-            addMarkers(lng = ~X, lat = ~Y, label = ~School.Name, group = "RVA Schools Data") %>%
+            addMarkers(lng = ~X, lat = ~Y, label = ~School.Name, group = "Richmond Schools") %>%
             
             addLayersControl(
                 overlayGroups = c("Richmond Schools", "Streets"),
