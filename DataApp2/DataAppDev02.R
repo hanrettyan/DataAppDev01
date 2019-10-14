@@ -31,7 +31,7 @@ ui <- dashboardPage(skin = "yellow",
                     # Sidebar/list of classes to open pages
                     dashboardSidebar(
                         # The following line hides the toggle button on the dashboardheader:
-                        tags$script(JS("document.getElementsByClassName('sidebar-toggle')[0].style.visibility = 'hidden';")),
+                        # tags$script(JS("document.getElementsByClassName('sidebar-toggle')[0].style.visibility = 'hidden';")),
                         sidebarMenu(
                             menuItem("ENVS Data Portal", tabName= "dataportal", icon = icon("dashboard")),
                             menuItem("Undergraduate Classes",
@@ -67,7 +67,7 @@ ui <- dashboardPage(skin = "yellow",
                                         # valueBox( format( sum(araptusdata$Sites), big.mark=",", scientific=FALSE), "Total Sites", icon=icon("couch")),
                                         title = "Data",
                                         h2(" "),  # Just makes blank spaces between lines.
-                                        dataTableOutput("araptusdatatable", height = 400)  
+                                        dataTableOutput("araptusdatatable", height = 350)  
                                     ),
                                     
                                     fillPage(
@@ -85,7 +85,7 @@ ui <- dashboardPage(skin = "yellow",
                                         # valueBox( format( sum(araptusdata$Sites), big.mark=",", scientific=FALSE), "Total Sites", icon=icon("couch")),
                                         title = "Data",
                                         h2(" "),  # Just makes blank spaces between lines.
-                                        dataTableOutput("rvaschoolsdatatable", height = 400)  
+                                        dataTableOutput("rvaschoolsdatatable", height = 350)  
                                     ),
                                     
                                     fillPage(
