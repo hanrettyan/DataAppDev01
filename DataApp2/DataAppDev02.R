@@ -18,6 +18,7 @@ library(htmlwidgets)
 classesdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRFdDGgmoI-9prZL45gHOixA4thITZleI_DkEZ49E-JqELRaxn8K46YM1HaBb0bBgkV5Xx-YrxKRgYM/pub?output=csv")
 araptusdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQNCFb3C1oSia_dN5ISXusrGqwVSFibt0_zkqq7wiNtW_tl1DM-Ch-fIKKmIz_ijXxdrKux6qvvy8yD/pub?output=csv")
 rvaschoolsdata <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRQG-5hP_znz9xCFwR8VeAQv4B1ALFZIljlIhhnZHtdmd57c5JDJz3O0Y5SkkaHEDVJB7CJetDPb6KW/pub?gid=466483422&single=true&output=csv")
+# rast <- raster("RVAtemp.tif") # Used this as an example of pulling into leaflet. Not necessary here.
 
 #################
 ###### UI #######
@@ -50,12 +51,16 @@ ui <- dashboardPage(skin = "yellow",
                             
                             #ENVS DATA PORTAL HOME PAGE:
                             tabItem(tabName = "dataportal",
-                                    fillPage(
-                                        h1("Data Portal of ENVS data for classes."),
-                                        tags$img(src="ces_logo.png", width="80%", align="center"),  
-                                        h2("Blahdy blah blah blahhhhh!"),  
-                                        h2(" "),  # Just makes blank space between lines,
-                                        h4("This is cool!")
+                                    fluidRow(
+                                        column(
+                                            width = 12,
+                                            h1("Data Portal of ENVS data for classes."),
+                                            tags$img(src = "ces_logo.png", width="90%", align="center"),  
+                                            h2("Blahdy blah blah blahhhhh!"),  
+                                            h2(" "),  # Just makes blank space between lines,
+                                            h4("This is cool!")
+                                        )
+                                        
                                     )),
                             
                             #ENVS 401 page: preferred layout
@@ -222,6 +227,8 @@ server <- function(input, output) {
     # Output for RVA SCHOOLS leaflet:
     output$rvaschoolsmap <- renderLeaflet({
         leaflet(sd_map_rvaschools) %>%
+            
+            # addRasterImage(rast, group = "Heat Islands") %>%   # Used this as a sample. Not necessary here. 
             
             addProviderTiles( providers$Esri.WorldStreetMap, group = "Streets") %>%
             
