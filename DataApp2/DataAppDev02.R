@@ -51,17 +51,15 @@ ui <- dashboardPage(skin = "yellow",
                             
                             #ENVS DATA PORTAL HOME PAGE:
                             tabItem(tabName = "dataportal",
-                                    fluidRow(
-                                        column(
-                                            width = 12,
-                                            h1("Data Portal of ENVS data for classes."),
-                                            tags$img(src = "ces_logo.png", width="90%", align="center"),  
-                                            h2("Blahdy blah blah blahhhhh!"),  
-                                            h2(" "),  # Just makes blank space between lines,
-                                            h4("This is cool!")
+                                    fluidPage(
+                                        tags$img(src = "ces_logo.png", width="90%", align="center"),
+                                        h1("Data Portal of ENVS data for classes."),
+                                        h2("Blahdy blah blah blahhhhh!"),  
+                                        h2(" "),  # Just makes blank space between lines,
+                                        h4("This is cool!")
                                         )
                                         
-                                    )),
+                                    ),
                             
                             #ENVS 401 page: preferred layout
                             tabItem(tabName = "envs401",
