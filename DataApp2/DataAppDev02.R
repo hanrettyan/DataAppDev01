@@ -113,8 +113,7 @@ ui <- dashboardPage(skin = "yellow",
                             tabItem(tabName = "envs603",
                                     fillPage(
                                         h1("Oh no! This page is empty!"),
-                                        h3("But in the meantime... what do you call a cashew that goes to outer space?"),
-                                        h3("..... an ASTRONUT!!!"),
+                                        h3("This data portal will be designed to host Shapefiles, Rasters, File Geodatabases, KML files and Tabular data."),
                                         title = "Envs 603 data"))
                             
                             
