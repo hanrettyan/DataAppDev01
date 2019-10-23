@@ -54,9 +54,9 @@ ui <- dashboardPage(skin = "yellow",
                                     fluidPage(
                                         tags$img(src = "ces_logo.png", width="90%", align="center"),
                                         h1("Data Portal of ENVS data for classes."),
-                                        h2("Blahdy blah blah blahhhhh!"),  
+                                        h2("This is a sample home space for a data portal!"),  
                                         h2(" "),  # Just makes blank space between lines,
-                                        h4("This is cool!")
+                                        h4("This will be a great place to host some data.")
                                         )
                                         
                                     ),
@@ -102,7 +102,7 @@ ui <- dashboardPage(skin = "yellow",
                             tabItem(tabName = "envs302",
                                     fillPage(
                                         h1("Class Data for fake ENVS302"),
-                                        h4("Just to clarify, these aren't my grades. I did a little better than this..... :) "),
+                                        h4(" "),
                                         h2(" "),
                                         title = "Envs 302 data",
                                         dataTableOutput("classesdatatable", height = 500))),
