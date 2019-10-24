@@ -63,55 +63,55 @@ ui <- dashboardPage(skin = "yellow",
                             
                             #ENVS 401 page: preferred layout
                             tabItem(tabName = "envs401",
-                                    fillPage(
+                                    fluidPage(
                                         h1("Class Data for fake ENVS401"),
                                         h2(" "), # Just makes blank space between lines.
                                         h4("Select rows or use the selection tool on the map to filter data for download."),
                                         # valueBox( format( sum(araptusdata$Sites), big.mark=",", scientific=FALSE), "Total Sites", icon=icon("couch")),
                                         title = "Data",
                                         h2(" "),  # Just makes blank spaces between lines.
-                                        dataTableOutput("araptusdatatable", height = 350)  
+                                        dataTableOutput("araptusdatatable", height = 400)  
                                     ),
                                     
-                                    fillPage(
+                                    fluidPage(
                                         title = "Map",
-                                        leafletOutput("araptusmap", height = 350)  
+                                        leafletOutput("araptusmap", height = 400)  
                                     )),
                             
                             
                             #ENVS 602 page: 
                             tabItem(tabName = "envs602",
-                                    fillPage(
+                                    fluidPage(
                                         h1("Class Data for fake ENVS602"),
                                         h2(" "), # Just makes blank space between lines.
                                         h4("Select rows or use the selection tool on the map to filter data for download."),
                                         # valueBox( format( sum(araptusdata$Sites), big.mark=",", scientific=FALSE), "Total Sites", icon=icon("couch")),
                                         title = "Data",
                                         h2(" "),  # Just makes blank spaces between lines.
-                                        dataTableOutput("rvaschoolsdatatable", height = 350)  
+                                        dataTableOutput("rvaschoolsdatatable", height = 400)  
                                     ),
                                     
-                                    fillPage(
+                                    fluidPage(
                                         title = "Map",
-                                        leafletOutput("rvaschoolsmap", height = 350)  
+                                        leafletOutput("rvaschoolsmap", height = 400)  
                                     )),
                             
                             
                             #ENVS 302 page
                             #This page just includes a datatable as a fillpage
                             tabItem(tabName = "envs302",
-                                    fillPage(
+                                    fluidPage(
                                         h1("Class Data for fake ENVS302"),
                                         h4(" "),
                                         h2(" "),
                                         title = "Envs 302 data",
-                                        dataTableOutput("classesdatatable", height = 500))),
+                                        dataTableOutput("classesdatatable", height = 400))),
                             
                             
                             #ENVS 603 page
                             #This page is empty!
                             tabItem(tabName = "envs603",
-                                    fillPage(
+                                    fluidPage(
                                         h1("Oh no! This page is empty!"),
                                         h3("This data portal will be designed to host Shapefiles, Rasters, File Geodatabases, KML files and Tabular data."),
                                         title = "Envs 603 data"))
